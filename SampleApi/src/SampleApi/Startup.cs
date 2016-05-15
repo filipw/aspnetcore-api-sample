@@ -15,6 +15,7 @@ using SampleApi.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using SampleApi.Formatters;
 
 namespace SampleApi
@@ -41,18 +42,18 @@ namespace SampleApi
             services.AddSingleton<LinkProvider>();
             services.AddSingleton<ContactSelfLinkFilter>();
 
-            services.AddMvc().Configure<MvcOptions>(options =>
+            var mvcBuilder = services.AddMvc(options =>
             {
                 options.OutputFormatters.Insert(0, new HttpResponseMessageOutputFormatter());
                 options.OutputFormatters.Insert(0, new HttpNotAcceptableOutputFormatter());
                 options.OutputFormatters.Insert(0, new CsvMediaTypeFormatter());
-                options.AddXmlDataContractSerializerFormatter();
                 options.RespectBrowserAcceptHeader = true;
-
-            }).Configure<WebApiCompatShimOptions>(opt =>
-            {
-                opt.Formatters = new MediaTypeFormatterCollection();
             });
+            
+            // todo: check this
+            //    opt.Formatters = new MediaTypeFormatterCollection();
+            mvcBuilder.AddWebApiConventions();
+            mvcBuilder.AddXmlDataContractSerializerFormatters();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
