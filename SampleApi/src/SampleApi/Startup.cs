@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using SampleApi.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace SampleApi
 {
@@ -34,13 +35,13 @@ namespace SampleApi
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IContactRepository, InMemoryContactRepository>();
             services.AddSingleton<IContentNegotiator>(new DefaultContentNegotiator(excludeMatchOnTypeOnly: true));
             services.AddSingleton<LinkProvider>();
-            services.AddSingleton<ContactSelfLinkFilter>();
+            services.AddTransient<ContactSelfLinkFilter>();
 
             var mvcBuilder = services.AddMvc(options =>
             {
@@ -50,13 +51,9 @@ namespace SampleApi
                 options.RespectBrowserAcceptHeader = true;
             });
             
-            // todo: check this
-            //    opt.Formatters = new MediaTypeFormatterCollection();
-            mvcBuilder.AddWebApiConventions();
             mvcBuilder.AddXmlDataContractSerializerFormatters();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
