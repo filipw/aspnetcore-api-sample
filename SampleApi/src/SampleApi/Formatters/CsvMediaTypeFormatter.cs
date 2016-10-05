@@ -16,7 +16,6 @@ namespace SampleApi.Formatters
         public CsvMediaTypeFormatter()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/csv"));
-            //SupportedEncodings.Add(Encoding.UTF8);
         }
 
         protected override bool CanWriteType(Type type)
@@ -29,7 +28,7 @@ namespace SampleApi.Formatters
             return type.GetInterfaces().Any(interfaceType => interfaceType == typeof(IEnumerable));
         }
 
-        public async override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
             var itemType = context.ObjectType.GetElementType() ?? context.ObjectType.GetGenericArguments()[0];
 

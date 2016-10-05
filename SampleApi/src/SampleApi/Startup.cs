@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,10 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Formatting;
 using SampleApi.Filters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using SampleApi.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -46,9 +40,9 @@ namespace SampleApi
             var mvcBuilder = services.AddMvc(options =>
             {
                 options.OutputFormatters.Insert(0, new HttpResponseMessageOutputFormatter());
-                options.OutputFormatters.Insert(0, new HttpNotAcceptableOutputFormatter());
-                options.OutputFormatters.Insert(0, new CsvMediaTypeFormatter());
-                options.RespectBrowserAcceptHeader = true;
+                options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+                options.RespectBrowserAcceptHeader = false;
+                options.ReturnHttpNotAcceptable = true;
             });
             
             mvcBuilder.AddXmlDataContractSerializerFormatters();
@@ -56,9 +50,6 @@ namespace SampleApi
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async context =>
